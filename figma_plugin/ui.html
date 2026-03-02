@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DramaVerse Design System Builder</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0F0F1A;
+    color: #F0EEFF;
+    font-family: 'Inter', -apple-system, sans-serif;
+    min-height: 560px;
+    overflow: hidden;
+  }
+
+  /* Background orbs */
+  .orb {
+    position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
+    filter: blur(60px);
+  }
+  .orb-1 { width: 260px; height: 260px; top: -80px; right: -60px; background: rgba(187,60,255,0.18); }
+  .orb-2 { width: 220px; height: 220px; bottom: -60px; left: -40px; background: rgba(255,45,120,0.20); }
+
+  .container {
+    position: relative; z-index: 1;
+    padding: 28px 24px 24px;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+
+  /* Logo area */
+  .logo-row {
+    display: flex; align-items: center; gap: 12px;
+  }
+  .logo-mark {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: linear-gradient(135deg, #FF2D78, #BB3CFF);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 0 18px rgba(255,45,120,0.5);
+    flex-shrink: 0;
+  }
+  .logo-text h1 {
+    font-size: 18px; font-weight: 800; letter-spacing: 1px;
+    background: linear-gradient(135deg, #FF2D78, #BB3CFF);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .logo-text p {
+    font-size: 11px; color: #6B618A; margin-top: 2px; letter-spacing: 0.3px;
+  }
+
+  /* What will be built */
+  .build-list {
+    background: #161625;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .build-list h3 {
+    font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: #6B618A;
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+  .build-item {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .build-icon {
+    width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center;
+    justify-content: center; font-size: 14px; flex-shrink: 0;
+  }
+  .build-icon.pink  { background: rgba(255,45,120,0.15); }
+  .build-icon.purple{ background: rgba(187,60,255,0.15); }
+  .build-icon.cyan  { background: rgba(0,229,255,0.12); }
+  .build-icon.gold  { background: rgba(255,214,0,0.12); }
+  .build-text { font-size: 13px; color: #AA9FC4; }
+  .build-text strong { color: #F0EEFF; font-weight: 700; }
+  .build-count {
+    margin-left: auto; font-size: 11px; font-weight: 700;
+    color: #FF2D78; background: rgba(255,45,120,0.12);
+    padding: 2px 8px; border-radius: 20px;
+  }
+
+  /* Warning notice */
+  .notice {
+    background: rgba(255,214,0,0.08);
+    border: 1px solid rgba(255,214,0,0.25);
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 11px; color: #AA9FC4; line-height: 1.6;
+  }
+  .notice strong { color: #FFD600; }
+
+  /* Build button */
+  .build-btn {
+    width: 100%; height: 54px; border: none; cursor: pointer;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #FF2D78, #BB3CFF);
+    color: white; font-size: 15px; font-weight: 800;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    box-shadow: 0 0 24px rgba(255,45,120,0.45);
+    transition: transform 100ms, box-shadow 100ms;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .build-btn:hover { box-shadow: 0 0 32px rgba(255,45,120,0.6); }
+  .build-btn:active { transform: scale(0.97); }
+  .build-btn:disabled {
+    background: linear-gradient(135deg, #661030, #4a1866);
+    box-shadow: none; cursor: not-allowed;
+  }
+  .btn-icon { font-size: 20px; }
+
+  /* Progress section */
+  .progress-section {
+    display: none; flex-direction: column; gap: 10px;
+  }
+  .progress-section.visible { display: flex; }
+
+  .progress-label {
+    font-size: 12px; color: #AA9FC4; letter-spacing: 0.3px;
+  }
+
+  .progress-bar-bg {
+    height: 6px; background: rgba(255,255,255,0.08);
+    border-radius: 3px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, #FF2D78, #BB3CFF);
+    border-radius: 3px;
+    box-shadow: 0 0 8px rgba(255,45,120,0.6);
+    transition: width 300ms ease;
+  }
+
+  /* Steps log */
+  .steps-log {
+    background: #161625; border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px; padding: 10px 14px;
+    max-height: 130px; overflow-y: auto;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .step-entry {
+    font-size: 11px; color: #6B618A; font-family: 'Courier New', monospace;
+    padding: 2px 0;
+    animation: fadeIn 200ms ease;
+  }
+  .step-entry.active { color: #AA9FC4; }
+  .step-entry.done { color: #00E676; }
+  .step-entry::before { content: '> '; color: #FF2D78; }
+
+  @keyframes fadeIn { from { opacity:0; transform: translateX(-4px); } to { opacity:1; transform: translateX(0); } }
+
+  /* Success state */
+  .success-card {
+    display: none; background: rgba(0,230,118,0.08);
+    border: 1px solid rgba(0,230,118,0.25); border-radius: 14px;
+    padding: 16px 18px; text-align: center; flex-direction: column; gap: 8px;
+  }
+  .success-card.visible { display: flex; }
+  .success-emoji { font-size: 32px; }
+  .success-title { font-size: 16px; font-weight: 800; color: #00E676; letter-spacing: 0.5px; }
+  .success-sub { font-size: 12px; color: #AA9FC4; line-height: 1.6; }
+  .success-pages {
+    display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 4px;
+  }
+  .page-pill {
+    font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    color: #F0EEFF;
+  }
+
+  /* Error state */
+  .error-card {
+    display: none; background: rgba(255,23,68,0.08);
+    border: 1px solid rgba(255,23,68,0.3); border-radius: 10px;
+    padding: 12px 14px; font-size: 12px; color: #FF6B6B; line-height: 1.6;
+  }
+  .error-card.visible { display: block; }
+
+  /* Close button */
+  .close-btn {
+    width: 100%; height: 38px; background: transparent; cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+    color: #6B618A; font-size: 12px; font-weight: 600; letter-spacing: 0.5px;
+    transition: border-color 150ms, color 150ms;
+  }
+  .close-btn:hover { border-color: rgba(255,255,255,0.2); color: #AA9FC4; }
+</style>
+</head>
+<body>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<div class="container">
+
+  <!-- Logo -->
+  <div class="logo-row">
+    <div class="logo-mark">🎭</div>
+    <div class="logo-text">
+      <h1>DRAMAVERSE</h1>
+      <p>Design System Builder v1.0.0</p>
+    </div>
+  </div>
+
+  <!-- What will be built -->
+  <div class="build-list" id="buildList">
+    <h3>What will be created</h3>
+    <div class="build-item">
+      <div class="build-icon pink">🎨</div>
+      <span class="build-text"><strong>Color Styles</strong> — 18 named paint styles</span>
+      <span class="build-count">18</span>
+    </div>
+    <div class="build-item">
+      <div class="build-icon purple">✨</div>
+      <span class="build-text"><strong>Effect Styles</strong> — Neon glow shadows</span>
+      <span class="build-count">5</span>
+    </div>
+    <div class="build-item">
+      <div class="build-icon cyan">Aa</div>
+      <span class="build-text"><strong>Text Styles</strong> — Oswald + Inter typography</span>
+      <span class="build-count">12</span>
+    </div>
+    <div class="build-item">
+      <div class="build-icon gold">⚡</div>
+      <span class="build-text"><strong>Components</strong> — Buttons, cards, nav, player</span>
+      <span class="build-count">8</span>
+    </div>
+    <div class="build-item">
+      <div class="build-icon pink">📱</div>
+      <span class="build-text"><strong>Screen Frames</strong> — All 7 key screens</span>
+      <span class="build-count">7</span>
+    </div>
+    <div class="build-item">
+      <div class="build-icon purple">📋</div>
+      <span class="build-text"><strong>Spec Tables</strong> — Spacing, radius, animation</span>
+      <span class="build-count">6</span>
+    </div>
+  </div>
+
+  <!-- Notice -->
+  <div class="notice">
+    <strong>⚠️ Before running:</strong> Make sure <strong>Oswald</strong> and <strong>Inter</strong>
+    fonts are installed on your system (download from Google Fonts). If not available, the plugin
+    will fall back to Roboto automatically.
+  </div>
+
+  <!-- Build button -->
+  <button class="build-btn" id="buildBtn" onclick="startBuild()">
+    <span class="btn-icon">🚀</span>
+    BUILD DESIGN SYSTEM
+  </button>
+
+  <!-- Progress section -->
+  <div class="progress-section" id="progressSection">
+    <div class="progress-label" id="progressLabel">Initializing...</div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <div class="steps-log" id="stepsLog"></div>
+  </div>
+
+  <!-- Error card -->
+  <div class="error-card" id="errorCard"></div>
+
+  <!-- Success card -->
+  <div class="success-card" id="successCard">
+    <div class="success-emoji">🎉</div>
+    <div class="success-title">Design System Built!</div>
+    <div class="success-sub">
+      Your DramaVerse design system is ready.<br>
+      Check these pages in your Figma file:
+    </div>
+    <div class="success-pages">
+      <span class="page-pill">🚀 Start Here</span>
+      <span class="page-pill">🎨 Tokens</span>
+      <span class="page-pill">📐 Components</span>
+      <span class="page-pill">📱 Screens</span>
+      <span class="page-pill">📋 Specs</span>
+    </div>
+  </div>
+
+  <!-- Close -->
+  <button class="close-btn" onclick="closePlugin()">CLOSE PLUGIN</button>
+
+</div>
+
+<script>
+  const steps = [];
+
+  function startBuild() {
+    const btn = document.getElementById('buildBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="btn-icon">⏳</span> BUILDING...';
+
+    document.getElementById('buildList').style.opacity = '0.4';
+    document.getElementById('progressSection').classList.add('visible');
+
+    parent.postMessage({ pluginMessage: { type: 'build' } }, '*');
+  }
+
+  function closePlugin() {
+    parent.postMessage({ pluginMessage: { type: 'close' } }, '*');
+  }
+
+  function addStep(text, state = 'active') {
+    const log = document.getElementById('stepsLog');
+    const entry = document.createElement('div');
+    entry.className = `step-entry ${state}`;
+    entry.textContent = text;
+    log.appendChild(entry);
+    log.scrollTop = log.scrollHeight;
+
+    // Mark previous as done
+    const entries = log.querySelectorAll('.step-entry.active');
+    entries.forEach((e, i) => {
+      if (i < entries.length - 1) {
+        e.classList.remove('active');
+        e.classList.add('done');
+      }
+    });
+  }
+
+  window.onmessage = (event) => {
+    const msg = event.data.pluginMessage;
+    if (!msg) return;
+
+    if (msg.type === 'progress') {
+      document.getElementById('progressLabel').textContent = msg.step;
+      document.getElementById('progressFill').style.width = msg.pct + '%';
+      addStep(msg.step);
+    }
+
+    if (msg.type === 'done') {
+      document.getElementById('progressFill').style.width = '100%';
+      document.getElementById('progressLabel').textContent = '✅ Complete!';
+      addStep('Done! All assets created ✓', 'done');
+
+      setTimeout(() => {
+        document.getElementById('progressSection').style.display = 'none';
+        document.getElementById('successCard').classList.add('visible');
+        document.getElementById('buildBtn').style.display = 'none';
+      }, 600);
+    }
+
+    if (msg.type === 'error') {
+      const errCard = document.getElementById('errorCard');
+      errCard.textContent = '❌ Error: ' + msg.message + '\n\nTip: Make sure you have Oswald and Inter fonts installed, or the plugin will use Roboto as fallback.';
+      errCard.classList.add('visible');
+      document.getElementById('buildBtn').disabled = false;
+      document.getElementById('buildBtn').innerHTML = '<span class="btn-icon">🔄</span> RETRY';
+    }
+  };
+</script>
+</body>
+</html>
