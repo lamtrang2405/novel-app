@@ -114,8 +114,8 @@ flutter run -d ios
 ### Build
 
 ```bash
-# Web
-flutter build web --release
+# Web (output: build/web — HTML, JS, CSS)
+flutter build web --base-href "/"
 
 # Android APK
 flutter build apk --release
@@ -123,6 +123,34 @@ flutter build apk --release
 # iOS
 flutter build ios --release
 ```
+
+### Deploy web (host on HTML)
+
+The web build is in **`build/web`**. You can upload that folder to any static host.
+
+**Option A — Firebase Hosting (recommended)**
+
+1. Install Firebase CLI: `npm install -g firebase-tools`
+2. Log in: `firebase login`
+3. Create/link project: `firebase use --add` (pick or create a project)
+4. Deploy:
+   ```bash
+   flutter build web --base-href "/"
+   firebase deploy
+   ```
+   Your app will be live at `https://YOUR_PROJECT_ID.web.app`.
+
+**Option B — GitHub Pages (auto on push to `main`)**
+
+1. In the repo: **Settings → Pages**.
+2. Under **Build and deployment**, set **Source** to **Deploy from a branch**.
+3. Under **Branch**, choose **gh-pages** and **/ (root)**. Click **Save**.
+4. Push to `main`; the workflow deploys `build/web` to the `gh-pages` branch.  
+   Live site: **https://lamtrang2405.github.io/novel-app/**.
+
+**Option C — Other hosts**
+
+Upload the contents of `build/web` to **Netlify**, **Vercel**, or any static host. For client-side routing, configure redirects so all routes serve `index.html`.
 
 ---
 
