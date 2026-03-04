@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/onboarding/splash_screen.dart';
@@ -20,6 +21,13 @@ final _shellNavigatorKey = GlobalKey<NavigatorState>();
 final appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/',
+  redirect: (context, state) {
+    // On web, always start at splash so users see full app flow (not reader directly)
+    if (kIsWeb && state.matchedLocation.contains('/chapter/')) {
+      return '/';
+    }
+    return null;
+  },
   routes: [
     GoRoute(
       path: '/',
