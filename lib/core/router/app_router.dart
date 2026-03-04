@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/onboarding/splash_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
-import '../../features/hush/screens/hush_shell.dart';
-import '../../features/hush/screens/hush_home_screen.dart';
-import '../../features/hush/screens/hush_explore_screen.dart';
-import '../../features/hush/screens/hush_library_screen.dart';
-import '../../features/hush/screens/hush_profile_screen.dart';
+import '../../features/home/main_shell.dart';
+import '../../features/home/home_screen.dart';
+import '../../features/discover/discover_screen.dart';
+import '../../features/library/library_screen.dart';
+import '../../features/profile/profile_screen.dart';
 import '../../features/novel_detail/novel_detail_screen.dart';
 import '../../features/chapter_reader/chapter_reader_screen.dart';
 import '../../features/audio_player/audio_player_screen.dart';
@@ -43,23 +43,23 @@ final appRouter = GoRouter(
     ),
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
-      builder: (context, state, child) => HushShell(child: child),
+      builder: (context, state, child) => MainShell(child: child),
       routes: [
         GoRoute(
           path: '/home',
-          builder: (context, state) => const HushHomeScreen(),
+          builder: (context, state) => const HomeScreen(),
         ),
         GoRoute(
           path: '/discover',
-          builder: (context, state) => const HushExploreScreen(),
+          builder: (context, state) => const DiscoverScreen(),
         ),
         GoRoute(
           path: '/library',
-          builder: (context, state) => const HushLibraryScreen(),
+          builder: (context, state) => const LibraryScreen(),
         ),
         GoRoute(
           path: '/profile',
-          builder: (context, state) => const HushProfileScreen(),
+          builder: (context, state) => const ProfileScreen(),
         ),
       ],
     ),

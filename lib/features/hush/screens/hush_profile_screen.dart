@@ -68,7 +68,7 @@ class HushProfileScreen extends ConsumerWidget {
                 ),
               ),
               Text(
-                '@sofia.hush • Since 2025',
+                'DramaVerse • Your Drama. Your Story.',
                 style: TextStyle(fontSize: 13, color: HushColors.t2),
               ),
               const SizedBox(height: 20),
@@ -116,7 +116,7 @@ class HushProfileScreen extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(25),
                         ),
                         child: const Text(
-                          'HUSH+',
+                          'VIP',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
@@ -177,7 +177,7 @@ class HushProfileScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               Center(
                 child: Text(
-                  'Hush v1.0 • Your secret escape',
+                  'DramaVerse v1.0 • novel_app',
                   style: TextStyle(fontSize: 12, color: HushColors.t3),
                 ),
               ),
