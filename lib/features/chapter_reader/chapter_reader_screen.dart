@@ -900,7 +900,7 @@ class _LockedChapterScreen extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 32),
                   child: _UnlockBtn(
                     label: '✦  GET VIP — UNLOCK ALL CHAPTERS',
-                    onTap: () => context.go('/subscription'),
+                    onTap: () => context.push('/subscription'),
                     gradient: AppColors.primaryGradient,
                     glow: AppColors.neonPinkGlow(blur: 16),
                   ),

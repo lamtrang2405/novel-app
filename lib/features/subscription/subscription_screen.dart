@@ -38,17 +38,25 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(30)),
                   ),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (user.hasActiveSubscription)
-                          _buildActiveStatus(user.subscriptionExpiry!),
-                        _buildBenefits(),
-                        const SizedBox(height: 24),
-                        Text('Choose Your Plan',
-                            style: AppTextStyles.displaySmall()),
+                  child: Scrollbar(
+                    thumbVisibility: true,
+                    thickness: 6,
+                    radius: const Radius.circular(3),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (user.hasActiveSubscription)
+                            _buildActiveStatus(user.subscriptionExpiry!),
+                          _buildBenefits(),
+                          const SizedBox(height: 24),
+                          Text(
+                            'Choose Your Plan',
+                            style: AppTextStyles.displaySmall(
+                              color: AppColors.textPrimaryLight,
+                            ),
+                          ),
                         const SizedBox(height: 16),
                         ...AppConstants.subscriptionPlans.asMap().entries.map(
                           (entry) => _buildPlanCard(
@@ -66,12 +74,15 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                         Center(
                           child: Text(
                             'Cancel anytime. No hidden fees.',
-                            style: AppTextStyles.bodySmall(),
+                            style: AppTextStyles.bodySmall(
+                              color: AppColors.textSecondaryLight,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 24),
                         _buildFAQ(),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -133,10 +144,13 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('VIP Active', style: AppTextStyles.titleSmall()),
+                Text(
+                  'VIP Active',
+                  style: AppTextStyles.titleSmall(color: AppColors.textPrimaryLight),
+                ),
                 Text(
                   'Expires ${_formatDate(expiry)}',
-                  style: AppTextStyles.bodySmall(),
+                  style: AppTextStyles.bodySmall(color: AppColors.textSecondaryLight),
                 ),
               ],
             ),
@@ -165,7 +179,10 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('VIP Benefits', style: AppTextStyles.titleMedium()),
+          Text(
+            'VIP Benefits',
+            style: AppTextStyles.titleMedium(color: AppColors.textPrimaryLight),
+          ),
           const SizedBox(height: 12),
           ...benefits.map(
             (b) => Padding(
@@ -182,9 +199,14 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                     child: Icon(b.$2, color: Colors.white, size: 16),
                   ),
                   const SizedBox(width: 12),
-                  Text(b.$1,
-                      style:
-                          AppTextStyles.bodyMedium(color: AppColors.textPrimary)),
+                  Expanded(
+                    child: Text(
+                      b.$1,
+                      style: AppTextStyles.bodyMedium(
+                        color: AppColors.textPrimaryLight,
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -245,8 +267,12 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                 children: [
                   Row(
                     children: [
-                      Text(plan['name'] as String,
-                          style: AppTextStyles.titleMedium()),
+                      Text(
+                        plan['name'] as String,
+                        style: AppTextStyles.titleMedium(
+                          color: AppColors.textPrimaryLight,
+                        ),
+                      ),
                       if (tag != null) ...[
                         const SizedBox(width: 8),
                         Container(
@@ -271,7 +297,9 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                   const SizedBox(height: 4),
                   Text(
                     plan['description'] as String,
-                    style: AppTextStyles.bodySmall(),
+                    style: AppTextStyles.bodySmall(
+                      color: AppColors.textSecondaryLight,
+                    ),
                   ),
                 ],
               ),
@@ -285,7 +313,9 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                 ),
                 Text(
                   '/${plan['period']}',
-                  style: AppTextStyles.bodySmall(),
+                  style: AppTextStyles.bodySmall(
+                    color: AppColors.textSecondaryLight,
+                  ),
                 ),
               ],
             ),
@@ -299,7 +329,10 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('FAQ', style: AppTextStyles.titleMedium()),
+        Text(
+          'FAQ',
+          style: AppTextStyles.titleMedium(color: AppColors.textPrimaryLight),
+        ),
         const SizedBox(height: 12),
         _faqItem(
           'Can I cancel anytime?',
@@ -319,14 +352,21 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
 
   Widget _faqItem(String question, String answer) {
     return ExpansionTile(
-      title: Text(question, style: AppTextStyles.titleSmall()),
+      title: Text(
+        question,
+        style: AppTextStyles.titleSmall(color: AppColors.textPrimaryLight),
+      ),
       iconColor: AppColors.primary,
-      collapsedIconColor: AppColors.textHint,
+      collapsedIconColor: AppColors.textSecondaryLight,
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-          child: Text(answer,
-              style: AppTextStyles.bodyMedium(color: AppColors.textSecondary)),
+          child: Text(
+            answer,
+            style: AppTextStyles.bodyMedium(
+              color: AppColors.textSecondaryLight,
+            ),
+          ),
         ),
       ],
     );
