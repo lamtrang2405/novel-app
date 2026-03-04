@@ -42,7 +42,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
-          _buildSliverAppBar(context, user.name, user.coins),
+          _buildSliverAppBar(context, user.name),
           SliverToBoxAdapter(
             child: _buildFeaturedSection(context, featured),
           ),
@@ -62,7 +62,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   // ── App bar ───────────────────────────────────────────────────────────────
-  Widget _buildSliverAppBar(BuildContext context, String name, int coins) {
+  Widget _buildSliverAppBar(BuildContext context, String name) {
     return SliverAppBar(
       floating: true,
       snap: true,
@@ -88,8 +88,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       actions: [
-        _CoinChip(coins: coins, onTap: () => context.go('/wallet')),
-        const SizedBox(width: 8),
         _VipBadge(onTap: () => context.go('/subscription')),
         const SizedBox(width: 12),
       ],
@@ -220,42 +218,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           },
         ),
       ],
-    );
-  }
-}
-
-// ── Coin chip ─────────────────────────────────────────────────────────────────
-class _CoinChip extends StatelessWidget {
-  final int coins;
-  final VoidCallback onTap;
-
-  const _CoinChip({required this.coins, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-        decoration: BoxDecoration(
-          color: AppColors.bgCard,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: AppColors.gold.withValues(alpha: 0.3),
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('🪙', style: TextStyle(fontSize: 13)),
-            const SizedBox(width: 4),
-            Text(
-              coins.toString(),
-              style: AppTextStyles.labelSmall(color: AppColors.gold),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -38,6 +38,11 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
     final allNovels = ref.watch(novelsProvider);
     final bookmarked =
         allNovels.where((n) => user.bookmarkedNovels.contains(n.id)).toList();
+    // Only show reading progress for novels that still exist in data
+    final validNovelIds = allNovels.map((n) => n.id).toSet();
+    final readingHistory = user.readingHistory
+        .where((p) => validNovelIds.contains(p.novelId))
+        .toList();
 
     return Scaffold(
       backgroundColor: AppColors.bgDark,
@@ -90,9 +95,9 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
                           const Icon(Icons.menu_book_rounded, size: 15),
                           const SizedBox(width: 6),
                           const Text('READING'),
-                          if (user.readingHistory.isNotEmpty) ...[
+                          if (readingHistory.isNotEmpty) ...[
                             const SizedBox(width: 6),
-                            _TabBadge(count: user.readingHistory.length),
+                            _TabBadge(count: readingHistory.length),
                           ],
                         ],
                       ),
@@ -122,7 +127,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen>
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  _buildReadingList(user.readingHistory),
+                  _buildReadingList(readingHistory),
                   _buildBookmarkGrid(bookmarked),
                 ],
               ),
@@ -293,28 +298,35 @@ class _ReadingCard extends ConsumerWidget {
                     ),
                     const SizedBox(height: 10),
 
-                    // Progress bar
-                    Stack(
-                      children: [
-                        Container(
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        ),
-                        FractionallySizedBox(
-                          widthFactor: pct,
-                          child: Container(
-                            height: 4,
-                            decoration: BoxDecoration(
-                              gradient: AppColors.primaryGradient,
-                              borderRadius: BorderRadius.circular(2),
-                              boxShadow: AppColors.neonPinkGlow(blur: 4),
+                    // Progress bar (SizedBox gives bounded height for FractionallySizedBox)
+                    SizedBox(
+                      height: 4,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Positioned.fill(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                          Positioned.fill(
+                            child: FractionallySizedBox(
+                              widthFactor: pct.clamp(0.0, 1.0),
+                              alignment: Alignment.centerLeft,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: AppColors.primaryGradient,
+                                  borderRadius: BorderRadius.circular(2),
+                                  boxShadow: AppColors.neonPinkGlow(blur: 4),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 6),
 

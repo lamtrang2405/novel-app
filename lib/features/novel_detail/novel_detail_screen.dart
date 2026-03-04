@@ -29,9 +29,52 @@ class _NovelDetailScreenState extends ConsumerState<NovelDetailScreen> {
   Widget build(BuildContext context) {
     final novel = ref.watch(novelByIdProvider(widget.novelId));
     if (novel == null) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: AppColors.bgDark,
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(
+                'Novel not found',
+                style: AppTextStyles.bodyMedium(color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => context.go('/home'),
+                child: Text(
+                  'Back to Home',
+                  style: AppTextStyles.labelLarge(color: AppColors.primary),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (novel.chapters.isEmpty) {
+      return Scaffold(
+        backgroundColor: AppColors.bgDark,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded),
+            onPressed: () => context.canPop() ? context.pop() : context.go('/home'),
+          ),
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              'No chapters available for ${novel.title}.',
+              style: AppTextStyles.bodyMedium(color: AppColors.textSecondary),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
       );
     }
 
@@ -411,9 +454,11 @@ class _NovelDetailScreenState extends ConsumerState<NovelDetailScreen> {
       builder: (ctx) => _UnlockSheet(
         novel: novel,
         chapterIndex: index,
-        onUnlock: () {
+        onGoToSubscription: () {
           Navigator.pop(ctx);
-          context.go('/novel/${novel.id}/chapter/$index');
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (context.mounted) context.go('/subscription');
+          });
         },
       ),
     );
@@ -498,7 +543,7 @@ class _ChapterTile extends StatelessWidget {
             if (isFree)
               _FreeBadge()
             else
-              _CoinBadge(cost: AppConstants.chapterCoinCost),
+              _VipLockBadge(),
           ],
         ),
       ),
@@ -523,11 +568,7 @@ class _FreeBadge extends StatelessWidget {
   }
 }
 
-class _CoinBadge extends StatelessWidget {
-  final int cost;
-
-  const _CoinBadge({required this.cost});
-
+class _VipLockBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -536,41 +577,31 @@ class _CoinBadge extends StatelessWidget {
         color: AppColors.bgCardAlt,
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: AppColors.gold.withValues(alpha: 0.4),
+          color: AppColors.accent.withValues(alpha: 0.4),
         ),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text('🪙', style: TextStyle(fontSize: 10)),
-          const SizedBox(width: 3),
-          Text(
-            '$cost',
-            style: AppTextStyles.labelSmall(color: AppColors.gold),
-          ),
-        ],
+      child: Text(
+        'VIP',
+        style: AppTextStyles.labelSmall(color: AppColors.accentLight),
       ),
     );
   }
 }
 
-// ── Unlock sheet ──────────────────────────────────────────────────────────────
-class _UnlockSheet extends ConsumerWidget {
+// ── Unlock sheet (subscription only) ─────────────────────────────────────────
+class _UnlockSheet extends StatelessWidget {
   final Novel novel;
   final int chapterIndex;
-  final VoidCallback onUnlock;
+  final VoidCallback onGoToSubscription;
 
   const _UnlockSheet({
     required this.novel,
     required this.chapterIndex,
-    required this.onUnlock,
+    required this.onGoToSubscription,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userProvider);
-    final canAfford = user.coins >= AppConstants.chapterCoinCost;
-
+  Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -592,76 +623,22 @@ class _UnlockSheet extends ConsumerWidget {
             const Text('🔒', style: TextStyle(fontSize: 40)),
             const SizedBox(height: 12),
             Text(
-              'UNLOCK CHAPTER ${chapterIndex + 1}',
+              'CHAPTER ${chapterIndex + 1} — VIP ONLY',
               style: AppTextStyles.displaySmall(color: AppColors.textPrimary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
-              'You need ${AppConstants.chapterCoinCost} coins to unlock this chapter.',
+              'Subscribe to VIP to unlock all chapters of ${novel.title}.',
               style: AppTextStyles.bodyMedium(color: AppColors.textSecondary),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 6),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('🪙', style: TextStyle(fontSize: 16)),
-                const SizedBox(width: 6),
-                Text(
-                  'Your balance: ${user.coins} coins',
-                  style: AppTextStyles.titleSmall(
-                    color: canAfford
-                        ? AppColors.gold
-                        : AppColors.error,
-                  ),
-                ),
-              ],
-            ),
             const SizedBox(height: 24),
-            if (canAfford)
-              GradientButton(
-                label: '🪙  UNLOCK FOR ${AppConstants.chapterCoinCost} COINS',
-                onTap: () {
-                  final success = ref
-                      .read(userProvider.notifier)
-                      .unlockChapter(
-                        novel.id,
-                        chapterIndex,
-                        AppConstants.chapterCoinCost,
-                      );
-                  if (success) onUnlock();
-                },
-              )
-            else
-              Column(
-                children: [
-                  GradientButton(
-                    label: 'GET MORE COINS  →',
-                    onTap: () {
-                      Navigator.pop(context);
-                      context.go('/wallet');
-                    },
-                    gradient: AppColors.goldGradient,
-                  ),
-                  const SizedBox(height: 10),
-                  OutlinedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      context.go('/subscription');
-                    },
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size(double.infinity, 50),
-                      side: const BorderSide(color: AppColors.accent),
-                      foregroundColor: AppColors.accentLight,
-                    ),
-                    child: Text(
-                      '✦  GET VIP — UNLOCK ALL',
-                      style: AppTextStyles.labelLarge(color: AppColors.accentLight),
-                    ),
-                  ),
-                ],
-              ),
+            GradientButton(
+              label: '✦  GET VIP — UNLOCK ALL CHAPTERS',
+              onTap: onGoToSubscription,
+              gradient: AppColors.primaryGradient,
+            ),
             const SizedBox(height: 8),
           ],
         ),

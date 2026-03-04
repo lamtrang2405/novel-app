@@ -2,7 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/novel_model.dart';
 import '../models/mock_data.dart';
 
-final novelsProvider = Provider<List<Novel>>((ref) => MockData.novels);
+/// Demo novels (loaded in main via MockData.ensureDemoDataLoaded()). Defensive copy; never empty.
+final novelsProvider = Provider<List<Novel>>((ref) {
+  final list = List<Novel>.from(MockData.novels);
+  return list;
+});
 
 final featuredNovelsProvider = Provider<List<Novel>>(
   (ref) => ref.watch(novelsProvider).where((n) => n.isFeatured).toList(),

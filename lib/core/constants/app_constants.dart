@@ -40,11 +40,8 @@ class AppConstants {
   // Audio speeds
   static const List<double> playbackSpeeds = [0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
 
-  // Free chapter count per novel
-  static const int freeChaptersPerNovel = 5;
-
-  // Chapter coin cost
-  static const int chapterCoinCost = 2;
+  // Free chapter count per novel (chapters 1..freeChaptersPerNovel free; from freeChaptersPerNovel+1 locked, subscription only)
+  static const int freeChaptersPerNovel = 6;
 }
 
 class AppRoutes {

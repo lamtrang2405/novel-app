@@ -65,20 +65,43 @@ class _ChapterReaderScreenState extends ConsumerState<ChapterReaderScreen>
   @override
   Widget build(BuildContext context) {
     final novel = ref.watch(novelByIdProvider(widget.novelId));
-    if (novel == null || widget.chapterIndex >= novel.chapters.length) {
-      return const Scaffold(
+    if (novel == null || novel.chapters.isEmpty || widget.chapterIndex < 0 || widget.chapterIndex >= novel.chapters.length) {
+      return Scaffold(
         backgroundColor: AppColors.bgDark,
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              Text(
+                novel == null ? 'Novel not found' : 'Chapter not found',
+                style: AppTextStyles.bodyMedium(color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () {
+                  if (novel != null) {
+                    context.go('/novel/${widget.novelId}');
+                  } else {
+                    context.go('/home');
+                  }
+                },
+                child: Text(
+                  'Go back',
+                  style: AppTextStyles.labelLarge(color: AppColors.primary),
+                ),
+              ),
+            ],
+          ),
+        ),
       );
     }
 
     final chapter = novel.chapters[widget.chapterIndex];
     final user = ref.watch(userProvider);
     final isFree = widget.chapterIndex < AppConstants.freeChaptersPerNovel;
-    final isUnlocked =
-        user.hasUnlockedChapter(widget.novelId, widget.chapterIndex);
-    final canRead =
-        isFree || user.hasActiveSubscription || isUnlocked;
+    final canRead = isFree || user.hasActiveSubscription;
 
     // Paywall — show locked screen if chapter not accessible
     if (!canRead) {
@@ -412,22 +435,33 @@ class _BottomBar extends StatelessWidget {
               Expanded(
                 child: Stack(
                   children: [
-                    Container(
+                    SizedBox(
                       height: 3,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    FractionallySizedBox(
-                      widthFactor: progress,
-                      child: Container(
-                        height: 3,
-                        decoration: BoxDecoration(
-                          gradient: AppColors.primaryGradient,
-                          borderRadius: BorderRadius.circular(2),
-                          boxShadow: AppColors.neonPinkGlow(blur: 4),
-                        ),
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Positioned.fill(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                          ),
+                          Positioned.fill(
+                            child: FractionallySizedBox(
+                              widthFactor: progress.clamp(0.0, 1.0),
+                              alignment: Alignment.centerLeft,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: AppColors.primaryGradient,
+                                  borderRadius: BorderRadius.circular(2),
+                                  boxShadow: AppColors.neonPinkGlow(blur: 4),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -761,9 +795,6 @@ class _LockedChapterScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.watch(userProvider);
-    final canAfford = user.coins >= AppConstants.chapterCoinCost;
-
     return Scaffold(
       backgroundColor: AppColors.bgDark,
       body: Stack(
@@ -843,88 +874,21 @@ class _LockedChapterScreen extends ConsumerWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: Text(
-                    'Unlock this chapter to keep reading ${novel.title}.',
+                    'Subscribe to VIP to unlock all chapters of ${novel.title}.',
                     style: AppTextStyles.bodyMedium(color: AppColors.textSecondary),
                     textAlign: TextAlign.center,
                   ),
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('🪙', style: TextStyle(fontSize: 18)),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Your balance: ${user.coins} coins',
-                      style: AppTextStyles.titleSmall(
-                        color: canAfford ? AppColors.gold : AppColors.error,
-                      ),
-                    ),
-                  ],
                 ),
 
                 const SizedBox(height: 32),
 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: Column(
-                    children: [
-                      if (canAfford)
-                        _UnlockBtn(
-                          label:
-                              '🪙  UNLOCK FOR ${AppConstants.chapterCoinCost} COINS',
-                          onTap: () {
-                            final success = ref
-                                .read(userProvider.notifier)
-                                .unlockChapter(
-                                  novel.id,
-                                  chapterIndex,
-                                  AppConstants.chapterCoinCost,
-                                );
-                            if (success) {
-                              // Rebuild the same route — now canRead = true
-                              context.go(
-                                  '/novel/${novel.id}/chapter/$chapterIndex');
-                            }
-                          },
-                          gradient: AppColors.primaryGradient,
-                          glow: AppColors.neonPinkGlow(blur: 16),
-                        )
-                      else
-                        _UnlockBtn(
-                          label: 'GET MORE COINS  →',
-                          onTap: () => context.go('/wallet'),
-                          gradient: AppColors.goldGradient,
-                          glow: [
-                            BoxShadow(
-                              color: AppColors.gold.withValues(alpha: 0.4),
-                              blurRadius: 16,
-                            ),
-                          ],
-                        ),
-                      const SizedBox(height: 12),
-                      GestureDetector(
-                        onTap: () => context.go('/subscription'),
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          decoration: BoxDecoration(
-                            color: AppColors.bgCard,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: AppColors.accent.withValues(alpha: 0.4),
-                            ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              '✦  GET VIP — UNLOCK ALL CHAPTERS',
-                              style: AppTextStyles.labelLarge(
-                                  color: AppColors.accentLight),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: _UnlockBtn(
+                    label: '✦  GET VIP — UNLOCK ALL CHAPTERS',
+                    onTap: () => context.go('/subscription'),
+                    gradient: AppColors.primaryGradient,
+                    glow: AppColors.neonPinkGlow(blur: 16),
                   ),
                 ),
 

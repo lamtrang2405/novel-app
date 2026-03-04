@@ -30,7 +30,7 @@ class ProfileScreen extends ConsumerWidget {
             child: _buildVIPBanner(context, user.hasActiveSubscription),
           ),
           SliverToBoxAdapter(
-            child: _buildMenu(context, ref, user.coins),
+            child: _buildMenu(context, ref),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 120)),
         ],
@@ -250,7 +250,7 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   // ── Menu ─────────────────────────────────────────────────────────────────────
-  Widget _buildMenu(BuildContext context, WidgetRef ref, int coins) {
+  Widget _buildMenu(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
       child: Column(
@@ -259,14 +259,6 @@ class ProfileScreen extends ConsumerWidget {
           _SectionLabel('ACCOUNT'),
           _MenuCard(
             children: [
-              _MenuItem(
-                icon: Icons.monetization_on_rounded,
-                iconColor: AppColors.gold,
-                label: 'Coin Wallet',
-                trailing: _CoinBadge(coins: coins),
-                onTap: () => context.push('/wallet'),
-              ),
-              const _CardDivider(),
               _MenuItem(
                 icon: Icons.workspace_premium_rounded,
                 iconColor: AppColors.primary,
@@ -514,26 +506,6 @@ class _CardDivider extends StatelessWidget {
       child: Divider(
         height: 1,
         color: Colors.white.withValues(alpha: 0.06),
-      ),
-    );
-  }
-}
-
-class _CoinBadge extends StatelessWidget {
-  final int coins;
-  const _CoinBadge({required this.coins});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        gradient: AppColors.goldGradient,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Text(
-        '🪙 $coins',
-        style: AppTextStyles.labelSmall(color: Colors.white),
       ),
     );
   }
