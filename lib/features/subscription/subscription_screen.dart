@@ -23,9 +23,11 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
   Widget build(BuildContext context) {
     final user = ref.watch(userProvider);
 
-    return Scaffold(
+    return PopScope(
+      canPop: true,
+      child: Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.heroGradient),
+        decoration: const BoxDecoration(gradient: AppColors.vipHeroGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -34,7 +36,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                 child: Container(
                   margin: const EdgeInsets.only(top: 16),
                   decoration: const BoxDecoration(
-                    color: AppColors.bgLight,
+                    color: AppColors.vipSurface,
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(30)),
                   ),
@@ -54,7 +56,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                           Text(
                             'Choose Your Plan',
                             style: AppTextStyles.displaySmall(
-                              color: AppColors.textPrimaryLight,
+                              color: AppColors.vipText,
                             ),
                           ),
                         const SizedBox(height: 16),
@@ -68,14 +70,16 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                               ? 'Start Weekly Pass — \$2.99'
                               : 'Start Monthly VIP — \$9.99',
                           onTap: () => _subscribe(context),
-                          icon: const Icon(Icons.workspace_premium, color: Colors.white, size: 16),
+                          gradient: AppColors.vipGoldGradient,
+                          boxShadow: AppColors.vipGoldGlow(blur: 18),
+                          icon: const Icon(Icons.workspace_premium, color: AppColors.vipBlack, size: 16),
                         ).animate().fadeIn(delay: 400.ms),
                         const SizedBox(height: 12),
                         Center(
                           child: Text(
                             'Cancel anytime. No hidden fees.',
                             style: AppTextStyles.bodySmall(
-                              color: AppColors.textSecondaryLight,
+                              color: AppColors.vipTextMuted,
                             ),
                           ),
                         ),
@@ -91,6 +95,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 
@@ -101,7 +106,10 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
         children: [
           GestureDetector(
             onTap: () => context.pop(),
-            child: const Icon(Icons.close, color: Colors.white, size: 26),
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              child: const Icon(Icons.close, color: AppColors.vipText, size: 26),
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -110,16 +118,16 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
               children: [
                 Text(
                   'Velvet VIP',
-                  style: AppTextStyles.displaySmall(color: Colors.white),
+                  style: AppTextStyles.displaySmall(color: AppColors.vipText),
                 ),
                 Text(
                   'Unlimited romance, zero limits',
-                  style: AppTextStyles.bodyMedium(color: Colors.white70),
+                  style: AppTextStyles.bodyMedium(color: AppColors.vipTextMuted),
                 ),
               ],
             ),
           ),
-          const Icon(Icons.workspace_premium, color: AppColors.gold, size: 48),
+          const Icon(Icons.workspace_premium, color: AppColors.vipGold, size: 48),
         ],
       ),
     );
@@ -131,14 +139,14 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: AppColors.success.withValues(alpha: 0.1),
+        color: AppColors.vipGold.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+        border: Border.all(color: AppColors.vipGold.withValues(alpha: 0.4)),
       ),
       child: Row(
         children: [
           const Icon(Icons.check_circle_rounded,
-              color: AppColors.success, size: 24),
+              color: AppColors.vipGold, size: 24),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -146,11 +154,11 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
               children: [
                 Text(
                   'VIP Active',
-                  style: AppTextStyles.titleSmall(color: AppColors.textPrimaryLight),
+                  style: AppTextStyles.titleSmall(color: AppColors.vipText),
                 ),
                 Text(
                   'Expires ${_formatDate(expiry)}',
-                  style: AppTextStyles.bodySmall(color: AppColors.textSecondaryLight),
+                  style: AppTextStyles.bodySmall(color: AppColors.vipTextMuted),
                 ),
               ],
             ),
@@ -181,32 +189,33 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
         children: [
           Text(
             'VIP Benefits',
-            style: AppTextStyles.titleMedium(color: AppColors.textPrimaryLight),
-          ),
-          const SizedBox(height: 12),
-          ...benefits.map(
-            (b) => Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              child: Row(
-                children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(b.$2, color: Colors.white, size: 16),
-                  ),
+                          style: AppTextStyles.titleMedium(color: AppColors.vipText),
+                          ),
+                          const SizedBox(height: 12),
+                          ...benefits.map(
+                            (b) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 5),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 32,
+                                    height: 32,
+                                    decoration: BoxDecoration(
+                                      gradient: AppColors.vipGoldGradient,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: AppColors.vipGoldGlow(blur: 8),
+                                    ),
+                                    child: Icon(b.$2, color: AppColors.vipBlack, size: 16),
+                                  ),
                   const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      b.$1,
-                      style: AppTextStyles.bodyMedium(
-                        color: AppColors.textPrimaryLight,
-                      ),
-                    ),
-                  ),
+                                  Expanded(
+                                    child: Text(
+                                      b.$1,
+                                      style: AppTextStyles.bodyMedium(
+                                        color: AppColors.vipText,
+                                      ),
+                                    ),
+                                  ),
                 ],
               ),
             ),
@@ -226,21 +235,13 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.vipSurface,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.primary.withValues(alpha: 0.15),
+            color: isSelected ? AppColors.vipGold : AppColors.vipGold.withValues(alpha: 0.25),
             width: isSelected ? 2.5 : 1,
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.15),
-                    blurRadius: 15,
-                    offset: const Offset(0, 5),
-                  )
-                ]
-              : [],
+          boxShadow: isSelected ? AppColors.vipGoldGlow(blur: 12) : [],
         ),
         child: Row(
           children: [
@@ -251,13 +252,13 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : Colors.grey.shade300,
+                  color: isSelected ? AppColors.vipGold : AppColors.vipTextMuted,
                   width: 2,
                 ),
-                color: isSelected ? AppColors.primary : Colors.transparent,
+                color: isSelected ? AppColors.vipGold : Colors.transparent,
               ),
               child: isSelected
-                  ? const Icon(Icons.check, color: Colors.white, size: 14)
+                  ? const Icon(Icons.check, color: AppColors.vipBlack, size: 14)
                   : null,
             ),
             const SizedBox(width: 14),
@@ -268,24 +269,24 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                   Row(
                     children: [
                       Text(
-                        plan['name'] as String,
-                        style: AppTextStyles.titleMedium(
-                          color: AppColors.textPrimaryLight,
-                        ),
+                      plan['name'] as String,
+                      style: AppTextStyles.titleMedium(
+                        color: AppColors.vipText,
                       ),
+                    ),
                       if (tag != null) ...[
                         const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 2),
                           decoration: BoxDecoration(
-                            gradient: AppColors.primaryGradient,
+                            gradient: AppColors.vipGoldGradient,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             tag,
                             style: const TextStyle(
-                              color: Colors.white,
+                              color: AppColors.vipBlack,
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
                             ),
@@ -298,7 +299,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                   Text(
                     plan['description'] as String,
                     style: AppTextStyles.bodySmall(
-                      color: AppColors.textSecondaryLight,
+                      color: AppColors.vipTextMuted,
                     ),
                   ),
                 ],
@@ -309,12 +310,12 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
               children: [
                 Text(
                   plan['price'] as String,
-                  style: AppTextStyles.titleLarge(color: AppColors.primary),
+                  style: AppTextStyles.titleLarge(color: AppColors.vipGold),
                 ),
                 Text(
                   '/${plan['period']}',
                   style: AppTextStyles.bodySmall(
-                    color: AppColors.textSecondaryLight,
+                    color: AppColors.vipTextMuted,
                   ),
                 ),
               ],
@@ -331,7 +332,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
       children: [
         Text(
           'FAQ',
-          style: AppTextStyles.titleMedium(color: AppColors.textPrimaryLight),
+          style: AppTextStyles.titleMedium(color: AppColors.vipText),
         ),
         const SizedBox(height: 12),
         _faqItem(
@@ -354,17 +355,17 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
     return ExpansionTile(
       title: Text(
         question,
-        style: AppTextStyles.titleSmall(color: AppColors.textPrimaryLight),
+        style: AppTextStyles.titleSmall(color: AppColors.vipText),
       ),
-      iconColor: AppColors.primary,
-      collapsedIconColor: AppColors.textSecondaryLight,
+      iconColor: AppColors.vipGold,
+      collapsedIconColor: AppColors.vipTextMuted,
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
           child: Text(
             answer,
             style: AppTextStyles.bodyMedium(
-              color: AppColors.textSecondaryLight,
+              color: AppColors.vipTextMuted,
             ),
           ),
         ),
@@ -389,30 +390,59 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
-          children: [
-            Icon(Icons.workspace_premium, color: AppColors.gold, size: 28),
-            SizedBox(width: 10),
-            Text('Welcome to VIP!'),
+      barrierDismissible: true,
+      builder: (ctx) => PopScope(
+        canPop: true,
+        child: AlertDialog(
+          backgroundColor: AppColors.vipSurface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
+            children: [
+              const Icon(Icons.workspace_premium, color: AppColors.vipGold, size: 28),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'Welcome to VIP!',
+                  style: AppTextStyles.titleMedium(color: AppColors.vipText),
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(ctx);
+                  context.pop();
+                },
+                child: const Icon(Icons.close, color: AppColors.vipTextMuted, size: 24),
+              ),
+            ],
+          ),
+          content: Text(
+            _selectedPlan == 1
+                ? 'You now have unlimited access to all chapters + 50 coins added!'
+                : 'You now have 7 days of unlimited access!',
+            style: AppTextStyles.bodyMedium(color: AppColors.vipTextMuted),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                context.pop();
+              },
+              child: Text('Close', style: TextStyle(color: AppColors.vipTextMuted)),
+            ),
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                context.pop();
+              },
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.vipGold,
+                foregroundColor: AppColors.vipBlack,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text('Start Reading!'),
+            ),
           ],
         ),
-        content: Text(
-          _selectedPlan == 1
-              ? 'You now have unlimited access to all chapters + 50 coins added!'
-              : 'You now have 7 days of unlimited access!',
-          style: AppTextStyles.bodyMedium(color: AppColors.textSecondary),
-        ),
-        actions: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              context.pop();
-            },
-            child: const Text('Start Reading!'),
-          ),
-        ],
       ),
     );
   }

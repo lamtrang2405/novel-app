@@ -129,7 +129,9 @@ class _ChapterReaderScreenState extends ConsumerState<ChapterReaderScreen>
     final bg = _bgColor(settings);
     final textColor = _textColor(settings);
 
-    return Scaffold(
+    return PopScope(
+      canPop: true,
+      child: Scaffold(
       backgroundColor: bg,
       body: Stack(
         children: [
@@ -234,13 +236,14 @@ class _ChapterReaderScreenState extends ConsumerState<ChapterReaderScreen>
                         ),
                         const SizedBox(height: 20),
 
-                        // Next chapter button
-                        if (widget.chapterIndex <
-                            novel.chapters.length - 1)
+                        // Next chapter button or Explore more (final chapter)
+                        if (widget.chapterIndex < novel.chapters.length - 1)
                           _NextChapterBtn(
                             novel: novel,
                             nextIndex: widget.chapterIndex + 1,
-                          ),
+                          )
+                        else
+                          _ExploreMoreBtn(novel: novel),
                       ],
                     ),
                   ),
@@ -274,6 +277,7 @@ class _ChapterReaderScreenState extends ConsumerState<ChapterReaderScreen>
           ),
         ],
       ),
+    ),
     );
   }
 
@@ -512,7 +516,10 @@ class _BottomBar extends StatelessWidget {
                       '/novel/${novel.id}/chapter/${chapterIndex + 1}'),
                 )
               else
-                const SizedBox(width: 80),
+                _NavBtn(
+                  label: 'Explore more →',
+                  onTap: () => context.go('/discover'),
+                ),
             ],
           ),
         ],
@@ -599,6 +606,45 @@ class _NextChapterBtn extends StatelessWidget {
             const SizedBox(width: 8),
             const Icon(Icons.arrow_forward_rounded,
                 color: Colors.white, size: 16),
+          ],
+        ),
+      )
+          .animate()
+          .fadeIn(duration: 400.ms)
+          .slideY(begin: 0.1, end: 0),
+    );
+  }
+}
+
+// ── Explore more similar novels (final chapter) ────────────────────────────────
+class _ExploreMoreBtn extends StatelessWidget {
+  final Novel novel;
+
+  const _ExploreMoreBtn({required this.novel});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.go('/discover'),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        decoration: BoxDecoration(
+          gradient: AppColors.primaryGradient,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: AppColors.neonPinkGlow(blur: 16),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.explore_rounded, color: Colors.white, size: 20),
+            const SizedBox(width: 10),
+            Text(
+              'Explore more similar novels',
+              style: AppTextStyles.labelLarge(color: Colors.white),
+            ),
+            const SizedBox(width: 8),
+            const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 16),
           ],
         ),
       )
@@ -797,7 +843,7 @@ class _ThemeBtn extends StatelessWidget {
   }
 }
 
-// ── Locked chapter paywall screen ─────────────────────────────────────────────
+// ── Locked chapter paywall screen (black & gold theme) ────────────────────────
 class _LockedChapterScreen extends ConsumerWidget {
   final Novel novel;
   final int chapterIndex;
@@ -809,108 +855,108 @@ class _LockedChapterScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      backgroundColor: AppColors.bgDark,
-      body: Stack(
-        children: [
-          // Blurred book cover background
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.15,
-              child: Image.network(
-                novel.coverUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, url, err) => const SizedBox.shrink(),
+    return PopScope(
+      canPop: true,
+      child: Scaffold(
+        backgroundColor: AppColors.vipBlack,
+        body: Stack(
+          children: [
+            // Blurred book cover background
+            Positioned.fill(
+              child: Opacity(
+                opacity: 0.12,
+                child: Image.network(
+                  novel.coverUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, url, err) => const SizedBox.shrink(),
+                ),
               ),
             ),
-          ),
-          // Dark overlay
-          Positioned.fill(
-            child: Container(color: AppColors.bgDark.withValues(alpha: 0.85)),
-          ),
-          SafeArea(
-            child: Column(
-              children: [
-                // Back button
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: GestureDetector(
-                    onTap: () => context.pop(),
-                    child: Container(
-                      margin: const EdgeInsets.all(16),
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.1),
+            Positioned.fill(
+              child: Container(color: AppColors.vipBlack.withValues(alpha: 0.88)),
+            ),
+            SafeArea(
+              child: Column(
+                children: [
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: GestureDetector(
+                      onTap: () => context.pop(),
+                      child: Container(
+                        margin: const EdgeInsets.all(16),
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: AppColors.vipGold.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: AppColors.vipGold.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          color: AppColors.vipText,
+                          size: 16,
                         ),
                       ),
-                      child: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: AppColors.textPrimary,
-                        size: 16,
+                    ),
+                  ),
+
+                  const Spacer(),
+
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.vipSurface,
+                      border: Border.all(
+                        color: AppColors.vipGold.withValues(alpha: 0.5),
+                        width: 1.5,
                       ),
+                      boxShadow: AppColors.vipGoldGlow(blur: 20),
+                    ),
+                    child: const Icon(
+                      Icons.lock_rounded,
+                      color: AppColors.vipGold,
+                      size: 36,
                     ),
                   ),
-                ),
+                  const SizedBox(height: 24),
 
-                const Spacer(),
-
-                // Lock icon with glow
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.bgCard,
-                    border: Border.all(
-                      color: AppColors.primary.withValues(alpha: 0.4),
-                      width: 1.5,
-                    ),
-                    boxShadow: AppColors.neonPinkGlow(blur: 20),
-                  ),
-                  child: const Icon(
-                    Icons.lock_rounded,
-                    color: AppColors.primary,
-                    size: 36,
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                Text(
-                  'CHAPTER ${chapterIndex + 1} LOCKED',
-                  style: AppTextStyles.displaySmall(color: AppColors.textPrimary),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
-                  child: Text(
-                    'Subscribe to VIP to unlock all chapters of ${novel.title}.',
-                    style: AppTextStyles.bodyMedium(color: AppColors.textSecondary),
+                  Text(
+                    'CHAPTER ${chapterIndex + 1} LOCKED',
+                    style: AppTextStyles.displaySmall(color: AppColors.vipText),
                     textAlign: TextAlign.center,
                   ),
-                ),
-
-                const SizedBox(height: 32),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: _UnlockBtn(
-                    label: '✦  GET VIP — UNLOCK ALL CHAPTERS',
-                    onTap: () => context.push('/subscription'),
-                    gradient: AppColors.primaryGradient,
-                    glow: AppColors.neonPinkGlow(blur: 16),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Text(
+                      'Subscribe to VIP to unlock all chapters of ${novel.title}.',
+                      style: AppTextStyles.bodyMedium(color: AppColors.vipTextMuted),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
-                ),
 
-                const Spacer(),
-              ],
+                  const SizedBox(height: 32),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: _UnlockBtn(
+                      label: '✦  GET VIP — UNLOCK ALL CHAPTERS',
+                      onTap: () => context.push('/subscription'),
+                      gradient: AppColors.vipGoldGradient,
+                      glow: AppColors.vipGoldGlow(blur: 16),
+                    ),
+                  ),
+
+                  const Spacer(),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

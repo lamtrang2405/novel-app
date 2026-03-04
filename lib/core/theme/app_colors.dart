@@ -68,6 +68,32 @@ class AppColors {
     end: Alignment.bottomRight,
   );
 
+  // ── VIP / Subscription (black & gold theme) ───────────────────────────────
+  static const Color vipBlack = Color(0xFF0D0D0D);
+  static const Color vipGold = Color(0xFFD4AF37);
+  static const Color vipGoldLight = Color(0xFFF4E4BC);
+  static const LinearGradient vipGoldGradient = LinearGradient(
+    colors: [Color(0xFFD4AF37), Color(0xFFB8860B)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+  static List<BoxShadow> vipGoldGlow({double blur = 20}) => [
+    BoxShadow(
+      color: vipGold.withValues(alpha: 0.45),
+      blurRadius: blur,
+    ),
+  ];
+
+  static const LinearGradient vipHeroGradient = LinearGradient(
+    colors: [Color(0xFF0D0D0D), Color(0xFF1A1810), Color(0xFF252015)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+
+  static const Color vipSurface = Color(0xFF1C1C1A);
+  static const Color vipText = Color(0xFFF4E4BC);
+  static const Color vipTextMuted = Color(0xFFB8A870);
+
   static const LinearGradient heroGradient = LinearGradient(
     colors: [Color(0xFF0A0A0F), Color(0xFF1A0A2E), Color(0xFF2D0F3D)],
     begin: Alignment.topCenter,

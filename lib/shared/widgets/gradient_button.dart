@@ -46,8 +46,7 @@ class _GradientButtonState extends State<GradientButton> {
           decoration: BoxDecoration(
             gradient: widget.gradient ?? AppColors.primaryGradient,
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            boxShadow: widget.boxShadow ??
-                AppColors.neonPinkGlow(blur: 18, spread: 1),
+            boxShadow: widget.boxShadow ?? AppColors.neonPinkGlow(blur: 18, spread: 1),
           ),
           child: Center(
             child: Row(
