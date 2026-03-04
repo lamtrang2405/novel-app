@@ -58,18 +58,20 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/novel/:id',
       builder: (context, state) {
-        final id = state.pathParameters['id']!;
+        final id = state.pathParameters['id'] ?? '';
         return NovelDetailScreen(novelId: id);
       },
     ),
     GoRoute(
       path: '/novel/:id/chapter/:chapterIndex',
       builder: (context, state) {
-        final novelId = state.pathParameters['id']!;
-        final chapterIndex =
-            int.tryParse(state.pathParameters['chapterIndex']!) ?? 0;
+        final novelId = state.pathParameters['id'] ?? '';
+        final chapterIndexStr = state.pathParameters['chapterIndex'] ?? '0';
+        final chapterIndex = int.tryParse(chapterIndexStr) ?? 0;
         return ChapterReaderScreen(
-            novelId: novelId, chapterIndex: chapterIndex);
+          novelId: novelId,
+          chapterIndex: chapterIndex.clamp(0, 999),
+        );
       },
     ),
     GoRoute(

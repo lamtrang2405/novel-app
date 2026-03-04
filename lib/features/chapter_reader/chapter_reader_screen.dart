@@ -65,34 +65,48 @@ class _ChapterReaderScreenState extends ConsumerState<ChapterReaderScreen>
   @override
   Widget build(BuildContext context) {
     final novel = ref.watch(novelByIdProvider(widget.novelId));
-    if (novel == null || novel.chapters.isEmpty || widget.chapterIndex < 0 || widget.chapterIndex >= novel.chapters.length) {
+    final isNovelMissing = novel == null;
+    final isChapterInvalid = novel != null && (novel.chapters.isEmpty ||
+        widget.chapterIndex < 0 ||
+        widget.chapterIndex >= novel.chapters.length);
+    if (isNovelMissing || isChapterInvalid) {
       return Scaffold(
         backgroundColor: AppColors.bgDark,
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 16),
-              Text(
-                novel == null ? 'Novel not found' : 'Chapter not found',
-                style: AppTextStyles.bodyMedium(color: AppColors.textSecondary),
+        body: SafeArea(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    isNovelMissing ? Icons.menu_book_outlined : Icons.error_outline,
+                    size: 64,
+                    color: AppColors.textHint,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    isNovelMissing ? 'Novel not found' : 'Chapter not found',
+                    style: AppTextStyles.bodyMedium(color: AppColors.textSecondary),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  TextButton(
+                    onPressed: () {
+                      if (novel != null) {
+                        context.go('/novel/${widget.novelId}');
+                      } else {
+                        context.go('/home');
+                      }
+                    },
+                    child: Text(
+                      'Go back',
+                      style: AppTextStyles.labelLarge(color: AppColors.primary),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () {
-                  if (novel != null) {
-                    context.go('/novel/${widget.novelId}');
-                  } else {
-                    context.go('/home');
-                  }
-                },
-                child: Text(
-                  'Go back',
-                  style: AppTextStyles.labelLarge(color: AppColors.primary),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       );
