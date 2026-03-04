@@ -9,7 +9,7 @@ class NovelApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
-      title: 'DramaVerse',
+      title: 'Hush',
       theme: AppTheme.darkTheme,
       themeMode: ThemeMode.dark,
       routerConfig: appRouter,
