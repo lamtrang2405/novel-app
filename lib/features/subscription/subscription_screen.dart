@@ -51,6 +51,7 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
                         children: [
                           if (user.hasActiveSubscription)
                             _buildActiveStatus(user.subscriptionExpiry!),
+                          if (!user.hasActiveSubscription) _buildPremiumUpgradeBanner(),
                           _buildBenefits(),
                           const SizedBox(height: 24),
                           Text(
@@ -136,31 +137,71 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
   Widget _buildActiveStatus(DateTime expiry) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: AppColors.vipGold.withValues(alpha: 0.12),
+        gradient: LinearGradient(
+          colors: [
+            AppColors.vipGold.withValues(alpha: 0.2),
+            AppColors.vipGold.withValues(alpha: 0.08),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.vipGold.withValues(alpha: 0.4)),
+        border: Border.all(color: AppColors.vipGold, width: 1.5),
+        boxShadow: AppColors.vipGoldGlow(blur: 12),
       ),
       child: Row(
         children: [
-          const Icon(Icons.check_circle_rounded,
-              color: AppColors.vipGold, size: 24),
-          const SizedBox(width: 10),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: AppColors.vipGold.withValues(alpha: 0.3),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.workspace_premium, color: AppColors.vipGold, size: 28),
+          ),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'VIP Active',
-                  style: AppTextStyles.titleSmall(color: AppColors.vipText),
+                  'Premium upgraded',
+                  style: AppTextStyles.titleMedium(color: AppColors.vipGold),
                 ),
+                const SizedBox(height: 2),
                 Text(
-                  'Expires ${_formatDate(expiry)}',
+                  'VIP active until ${_formatDate(expiry)}',
                   style: AppTextStyles.bodySmall(color: AppColors.vipTextMuted),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPremiumUpgradeBanner() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: AppColors.vipBlack.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.vipGold.withValues(alpha: 0.4)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.star_rounded, color: AppColors.vipGold, size: 24),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Upgrade to Premium — unlock all chapters, ad-free reading & more',
+              style: AppTextStyles.bodySmall(color: AppColors.vipText),
             ),
           ),
         ],
@@ -391,57 +432,113 @@ class _SubscriptionScreenState extends ConsumerState<SubscriptionScreen> {
     showDialog(
       context: context,
       barrierDismissible: true,
+      barrierColor: Colors.black54,
       builder: (ctx) => PopScope(
         canPop: true,
-        child: AlertDialog(
-          backgroundColor: AppColors.vipSurface,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: Row(
-            children: [
-              const Icon(Icons.workspace_premium, color: AppColors.vipGold, size: 28),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  'Welcome to VIP!',
-                  style: AppTextStyles.titleMedium(color: AppColors.vipText),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 340),
+            decoration: BoxDecoration(
+              color: AppColors.vipSurface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: AppColors.vipGold, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.vipGold.withValues(alpha: 0.3),
+                  blurRadius: 24,
+                  spreadRadius: 2,
                 ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(ctx);
-                  context.pop();
-                },
-                child: const Icon(Icons.close, color: AppColors.vipTextMuted, size: 24),
-              ),
-            ],
-          ),
-          content: Text(
-            _selectedPlan == 1
-                ? 'You now have unlimited access to all chapters + 50 coins added!'
-                : 'You now have 7 days of unlimited access!',
-            style: AppTextStyles.bodyMedium(color: AppColors.vipTextMuted),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                context.pop();
-              },
-              child: Text('Close', style: TextStyle(color: AppColors.vipTextMuted)),
+              ],
             ),
-            FilledButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                context.pop();
-              },
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.vipGold,
-                foregroundColor: AppColors.vipBlack,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              child: const Text('Start Reading!'),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header with gold strip
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  decoration: BoxDecoration(
+                    gradient: AppColors.vipGoldGradient,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.workspace_premium, color: AppColors.vipBlack, size: 28),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Welcome to VIP!',
+                          style: AppTextStyles.titleMedium(color: AppColors.vipBlack),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          context.pop();
+                        },
+                        child: const Icon(Icons.close, color: AppColors.vipBlack, size: 26),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        _selectedPlan == 1
+                            ? 'You now have unlimited access to all chapters + 50 coins added!'
+                            : 'You now have 7 days of unlimited access!',
+                        style: AppTextStyles.bodyMedium(color: AppColors.vipText),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          TextButton(
+                          onPressed: () {
+                            Navigator.pop(ctx);
+                            context.pop();
+                          },
+                          child: Text('Close', style: TextStyle(color: AppColors.vipTextMuted)),
+                        ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.pop(ctx);
+                                  context.pop();
+                                },
+                                borderRadius: BorderRadius.circular(14),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  decoration: BoxDecoration(
+                                    gradient: AppColors.vipGoldGradient,
+                                    borderRadius: BorderRadius.circular(14),
+                                    boxShadow: AppColors.vipGoldGlow(blur: 12),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'Start Reading!',
+                                      style: AppTextStyles.labelLarge(color: AppColors.vipBlack),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

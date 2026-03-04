@@ -349,7 +349,7 @@ class _TopBar extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => context.pop(),
+            onTap: () => context.go('/novel/${novel.id}'),
             child: Container(
               width: 38,
               height: 38,
@@ -493,9 +493,8 @@ class _BottomBar extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          // Nav buttons
+          // Nav buttons — center text in Expanded so both side buttons stay visible
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               if (chapterIndex > 0)
                 _NavBtn(
@@ -504,10 +503,14 @@ class _BottomBar extends StatelessWidget {
                       '/novel/${novel.id}/chapter/${chapterIndex - 1}'),
                 )
               else
-                const SizedBox(width: 80),
-              Text(
-                '${(progress * 100).toInt()}% done',
-                style: AppTextStyles.bodySmall(color: AppColors.textHint),
+                const SizedBox(width: 72),
+              Expanded(
+                child: Center(
+                  child: Text(
+                    '${(progress * 100).toInt()}% done',
+                    style: AppTextStyles.bodySmall(color: AppColors.textHint),
+                  ),
+                ),
               ),
               if (chapterIndex < novel.chapters.length - 1)
                 _NavBtn(
@@ -539,7 +542,8 @@ class _NavBtn extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        constraints: const BoxConstraints(minWidth: 72),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           gradient: AppColors.primaryGradient,
           borderRadius: BorderRadius.circular(20),
@@ -548,6 +552,8 @@ class _NavBtn extends StatelessWidget {
         child: Text(
           label,
           style: AppTextStyles.labelSmall(color: Colors.white),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
         ),
       ),
     );
@@ -881,7 +887,7 @@ class _LockedChapterScreen extends ConsumerWidget {
                   Align(
                     alignment: Alignment.topLeft,
                     child: GestureDetector(
-                      onTap: () => context.pop(),
+                      onTap: () => context.go('/novel/${novel.id}'),
                       child: Container(
                         margin: const EdgeInsets.all(16),
                         width: 40,
